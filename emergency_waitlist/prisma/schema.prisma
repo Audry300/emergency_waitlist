@@ -1,0 +1,24 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model Patient {
+    id            Int           @id @default(autoincrement())
+    createdAt     DateTime      @default(now())
+    name          String
+    estimatedWait Int
+    severity      Int
+    position      Int
+    code          String        @unique @db.VarChar(3)
+    status        PatientStatus @default(WAITING)
+}
+
+enum PatientStatus {
+    WAITING
+    TREATED
+}
