@@ -1,34 +1,37 @@
 'use client'
 
 import React,{useState} from 'react'
-import { Card, CardContent, Typography, Box, Checkbox} from '@mui/material';
-
+//import { Card, CardContent, Typography, Box, Checkbox} from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Checkbox } from '@mui/material';
 
 interface PatientInformationCardProps {
     name: string,
     severity:number,
+    estimatedWait:number,
     
 }
 
-const  PatientInformationCard:React.FC<PatientInformationCardProps> =({name,severity})=> {
+const  PatientInformationCard:React.FC<PatientInformationCardProps> =({name,severity,estimatedWait})=> {
     const [checked,setChecked] = useState<boolean>(false);
     const handleCheckBoxClick = () => {
         setChecked(true);
     }
     return (
-        <Card variant="outlined" style={{ cursor: 'pointer' }}>
-        <CardContent>
-            <Box>
-                <Typography variant="h5" component="div">
-                Name: {name}
-                </Typography>
-                <Typography variant="body1" component="div">
-                Severity: {severity}
-                </Typography>
-            </Box>
-            <Checkbox checked={checked} onChange={handleCheckBoxClick} />
-        </CardContent>
-        </Card>
+        <TableContainer component={Paper}>
+            <Table>
+                <TableBody>
+                    <TableRow>
+                        <TableCell>{name}</TableCell>
+                        <TableCell>{`${estimatedWait} min`}</TableCell>
+                        <TableCell>
+                            <Checkbox checked={checked} onChange={handleCheckBoxClick} />
+                        </TableCell>
+                    </TableRow>
+                </TableBody>
+            </Table>
+        </TableContainer>
         
     )
 }
+
+export default PatientInformationCard
