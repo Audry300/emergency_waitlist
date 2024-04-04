@@ -1,12 +1,14 @@
 'use client'
 
 import React,{useEffect,useState} from 'react'
+import { useRouter } from 'next/navigation'
 import { TextField, Button, Slider, Typography, Container, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 
 
 const  NewUser:React.FC = ()=> {
 
-  
+  const router = useRouter();
+
   const [name, setName] = useState<string>('');
   const [severity, setSeverity] = useState<number>(1);
   const [code,setCode] = useState<number>();
@@ -51,7 +53,8 @@ const  NewUser:React.FC = ()=> {
   };
 
   const handleClose = () =>{
-    setIsOpen(false); 
+    setIsOpen(false);
+    router.push('/admin')
   }
 
   return (
@@ -76,7 +79,7 @@ const  NewUser:React.FC = ()=> {
           step={1}
           marks
           min={1}
-          max={10}
+          max={3}
         />
         <Button type="submit" variant="contained" color="primary" style={{ backgroundColor: '#1976d2' }}>
           Add Patient
