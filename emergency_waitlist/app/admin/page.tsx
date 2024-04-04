@@ -20,8 +20,11 @@ const AdminPage:React.FC=({})=> {
       setChecked(true);
   }
 
-  const handleRowClick = (patient: Patient) => {
-    console.log('Clicked on row:', patient);
+  const handleRowClick = (patient: Patient, index: number) => {
+    
+    if(index === 0){
+      console.log('Clicked on row:', patient);
+    }
 };
 
   useEffect(()=>{
@@ -64,21 +67,21 @@ const AdminPage:React.FC=({})=> {
                   </TableHead>
                   <TableBody component={TableRow}  style={{ cursor: 'pointer' }}>
                     {patients && patients.map((patient, index) => (
-                      <TableRow key={index} onClick={() => handleRowClick(patient)}>
+                      <TableRow key={index} onClick={() => handleRowClick(patient, index)}>
                         <TableCell>{patient.name}</TableCell>
                         <TableCell>{patient.code}</TableCell>
                         <TableCell>{`${patient.estimatedWait} min`}</TableCell>
                         <TableCell>{patient.position}</TableCell>
                         <TableCell>{patient.severity}</TableCell>
                         <TableCell>
-                          <Checkbox checked={checked} onChange={() => setChecked(!checked)} />
+                        {index === 0 ? <Checkbox checked={checked} onChange={() => setChecked(!checked)} /> : null}
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               </TableContainer>
-            )};
+            )}
     </div>
   )
 }
