@@ -64,22 +64,73 @@ export const addPatient = async (patientData:PatientData):Promise<Patient> => {
         const code = await generateUniqueCode();
         const waitingListCount = await getCountOfWaitingList()
 
+        const patientsThatStayAhead = await prisma.patient.findMany({
+            where:{
+                status:'WAITING',
+                createdAt:{lte:new Date(Date.now() - 10*60*1000)}
+            },
+            orderBy:{
+                position:'asc'
+            },
+            select:{
+                severity:true,
+                estimatedWait:true
+            }
+
+
+        })
+
+        const lastPatientThatStayAhead=patientsThatStayAhead[patientsThatStayAhead.length-1]
+
+        const lastPatientEstimatedTreatmentTime:number = lastPatientThatStayAhead.severity*5
+
+        const patientsToMoveBack = await prisma.patient.findMany({
+            where:{
+                status:'WAITING',
+                severity:{lt:severity},
+                createdAt:{gte:new Date(Date.now() - 10*60*1000)}
+            },
+            orderBy:{
+                createdAt:'asc'
+            }
+        })
+
+        
+
+        const position = waitingListCount + 1 -patientsToMoveBack.length
+
+
         
 
         const createdPatient = await prisma.patient.create({
             data:{
                 name:name,
-                estimatedWait:10,
+                estimatedWait:lastPatientThatStayAhead.estimatedWait+lastPatientEstimatedTreatmentTime,
                 severity:severity,
-                position:waitingListCount+1,
+                position:position,
                 code:code
             },
             select:{
                 code:true,
                 estimatedWait:true,
                 position:true,
+                severity:true
             }
         })
+        const estimatedTreatmentTimeNewPatient:number = createdPatient.severity*5 // I assume it takes 5min per level of severity to treat an injury
+
+        // Patients with lesser severity move back to make room for the new one
+        for (const patient of patientsToMoveBack){
+            await prisma.patient.update({
+                where:{id:patient.id},
+                data:{
+                    position:patient.position+1,
+                    estimatedWait:patient.estimatedWait + estimatedTreatmentTimeNewPatient
+                    
+
+                }
+            })
+        }
 
         return createdPatient;
 
