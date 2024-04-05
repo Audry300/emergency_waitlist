@@ -22,6 +22,9 @@ export const getPatientsInTheWaitingList = async():Promise<Patient[]> =>{
         },
         where:{
             status:'WAITING'
+        },
+        orderBy:{
+            position:'asc'
         }
     })
 

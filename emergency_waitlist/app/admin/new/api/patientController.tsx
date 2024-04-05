@@ -13,6 +13,8 @@ interface Patient{
     code:string;
     estimatedWait:number;
     position:number
+    severity:number
+    
 }
 
 const generateCode = async ():Promise<string>=>{
@@ -36,13 +38,22 @@ async function generateUniqueCode(): Promise<string> {
     return code;
 }
 
-async function getCountOfWaitingList():Promise<number>{
-    const count = await prisma.patient.count({
+async function getCountOfWaitingList():Promise<{waitingListCount:number;lastPatient?:Patient}>{
+    const waitingListCount = await prisma.patient.count({
         where:{
             status:'WAITING'
         }
     })
-    return count;
+
+    const lastPatient = await prisma.patient.findFirst({
+        where:{
+            status:'WAITING'
+        },
+        orderBy:{
+            position:'desc'
+        }
+    })
+    return {waitingListCount,lastPatient:lastPatient?? undefined};
 }
 
 async function isCodeUnique(code: string): Promise<boolean> {
@@ -62,12 +73,19 @@ export const addPatient = async (patientData:PatientData):Promise<Patient> => {
     try{
         const {name, severity} = patientData;
         const code = await generateUniqueCode();
-        const waitingListCount = await getCountOfWaitingList()
-
+        const {waitingListCount,lastPatient} = await getCountOfWaitingList()
+        
         const patientsThatStayAhead = await prisma.patient.findMany({
             where:{
                 status:'WAITING',
-                createdAt:{lte:new Date(Date.now() - 10*60*1000)}
+                OR:[
+                    {
+                        createdAt:{lte:new Date(Date.now() - 10*60*1000)}
+                    },
+                    {
+                        severity:{gte:severity}
+                    }
+                ]
             },
             orderBy:{
                 position:'asc'
@@ -80,10 +98,28 @@ export const addPatient = async (patientData:PatientData):Promise<Patient> => {
 
         })
 
-        const lastPatientThatStayAhead=patientsThatStayAhead[patientsThatStayAhead.length-1]
+        let estimatedWait:number=0;
 
-        const lastPatientEstimatedTreatmentTime:number = lastPatientThatStayAhead.severity*5
+        if (patientsThatStayAhead.length > 0){
+           
 
+            const lastPatientThatStayAhead=patientsThatStayAhead[patientsThatStayAhead.length-1]
+            const lastPatientEstimatedTreatmentTime:number = lastPatientThatStayAhead.severity*5
+            
+            estimatedWait = lastPatientThatStayAhead.estimatedWait+lastPatientEstimatedTreatmentTime
+            
+
+        }
+        
+        else if(waitingListCount>0 && lastPatient){
+            
+            const lastPatientEstimatedTreatmentTime:number = lastPatient.severity*5
+            estimatedWait = lastPatient.estimatedWait+lastPatientEstimatedTreatmentTime
+            
+        }
+        
+
+    
         const patientsToMoveBack = await prisma.patient.findMany({
             where:{
                 status:'WAITING',
@@ -96,16 +132,12 @@ export const addPatient = async (patientData:PatientData):Promise<Patient> => {
         })
 
         
-
         const position = waitingListCount + 1 -patientsToMoveBack.length
-
-
-        
 
         const createdPatient = await prisma.patient.create({
             data:{
                 name:name,
-                estimatedWait:lastPatientThatStayAhead.estimatedWait+lastPatientEstimatedTreatmentTime,
+                estimatedWait:estimatedWait,
                 severity:severity,
                 position:position,
                 code:code

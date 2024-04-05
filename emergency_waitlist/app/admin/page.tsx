@@ -13,10 +13,11 @@ interface Patient{
 }
 
 const AdminPage:React.FC=({})=> {
+
   const [loading, setLoading] = useState<boolean>(true)
   const [patients,setPatients] = useState<Patient[]>();
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  
+
 
   useEffect(()=>{
     const fetchInitialData = async () =>{
@@ -35,7 +36,7 @@ const AdminPage:React.FC=({})=> {
     }
 
     fetchInitialData()
-     
+    
   },[])
 
 
@@ -50,8 +51,32 @@ const handleCloseConfirmation = () => {
   setSelectedPatient(null);
 };
 
-const handleConfirmation = () => {
+const handleConfirmation = async () => {
+  try {
+    if(selectedPatient){
+      const response = await fetch('/admin/api',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+        },
+        body:JSON.stringify(selectedPatient)
+       
+      }); 
+      const res = await response.json();
 
+      if(res=='success'){
+        setSelectedPatient(null)
+        location.reload();
+
+      }
+    }else{
+      console.error('Error while removing patient from the waiting list')
+    }
+  }
+  catch(error){
+    console.error('Error occurred while deleting patient', error);
+  }
+  
 }
   
 
@@ -61,9 +86,9 @@ return (
       <Typography variant="h5">Loading...</Typography>
     ) : (
       <div style={{ minWidth: '800px' }}>
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
+        <TableContainer style={{marginTop:'10px', marginBottom:'10px'}} component={Paper}>
+          <Table >
+            <TableHead style={{background:'grey' }}>
               <TableRow>
                 <TableCell>Name</TableCell>
                 <TableCell>Code</TableCell>
