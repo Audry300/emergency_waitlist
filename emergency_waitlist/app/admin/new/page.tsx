@@ -58,14 +58,14 @@ const  NewUser:React.FC = ()=> {
   }
 
   const style:CSSProperties ={
-    backgroundColor:'#FFF5EE',
-  borderRadius: '10px', 
-  position: 'absolute',
-  top: '30%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  height: '35%',
-  border: '2px solid #000'
+   
+    borderRadius: '10px', 
+    position: 'absolute',
+    top: '30%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    height: '35%',
+    border: '2px solid #000'
 
   };
 
