@@ -86,7 +86,7 @@ return (
       <Typography variant="h5">Loading...</Typography>
     ) : (
       <div style={{ minWidth: '800px' }}>
-        <TableContainer style={{marginTop:'10px', marginBottom:'10px'}} component={Paper}>
+        <TableContainer style={{marginTop:'10px', marginBottom:'10px', backgroundColor:'#FFF5EE', border: '2px solid #000'}} component={Paper}>
           <Table >
             <TableHead style={{background:'grey' }}>
               <TableRow>

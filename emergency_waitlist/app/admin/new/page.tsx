@@ -1,6 +1,6 @@
 'use client'
 
-import React,{useEffect,useState} from 'react'
+import React,{CSSProperties, useEffect,useState} from 'react'
 import { useRouter } from 'next/navigation'
 import { TextField, Button, Slider, Typography, Container, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 
@@ -57,9 +57,30 @@ const  NewUser:React.FC = ()=> {
     router.push('/admin')
   }
 
+  const style:CSSProperties ={
+    backgroundColor:'#FFF5EE',
+  borderRadius: '10px', 
+  position: 'absolute',
+  top: '30%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  height: '35%',
+  border: '2px solid #000'
+
+  };
+
+  const sentence: CSSProperties = {
+    textAlign: 'center',
+    marginTop: '15px', 
+    fontSize: '23px', 
+    fontWeight: 'bold', 
+  };
+
   return (
-    <Container maxWidth="sm">
-<form onSubmit={handleSubmit}>
+    <>
+    <Typography style={sentence}>Add a new patient to the waiting list</Typography>
+    <Container maxWidth="sm" style={style}>
+      <form onSubmit={handleSubmit}>
         <TextField
           label="Name"
           value={name}
@@ -101,6 +122,7 @@ const  NewUser:React.FC = ()=> {
         </DialogActions>
       </Dialog>
       </Container>
+      </>
 
   )
 }
