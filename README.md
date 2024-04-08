@@ -8,7 +8,7 @@ This application was built with NextJS.
 3. At the root folder of the application, create a new `.env` file, and inside, initialize a `DATABASE_URL` variable using the following pattern:
     * DATABASE_URL = "postgresql://postgres:{DB_PASSWORD}@localhost:{DB_PORTNUMBER}/{DB_NAME}"
     * Replace `DB_PASSWORD`, `DB_PORTNUMBER`, `DB_NAME` by their real values.
-4. Run `npx prisma generate` (this generates the ORM client that is used to interact with the database)
+4. Run `npx prisma migrate dev --name init` (this generates the ORM client that is used to interact with the database)
     The database tables will be initialized based on the Prisma models already defined in the Prisma folder.
 5. Run `npm install`
 6. Run `npm run dev`
